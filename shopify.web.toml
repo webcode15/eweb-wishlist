@@ -2,7 +2,5 @@ name = "React Router"
 roles = ["frontend", "backend"]
 webhooks_path = "/webhooks/app/uninstalled"
 [commands]
-# Use full `prisma generate` so the query engine is bundled; `--no-engine` breaks local SQLite
-# (P6001 / false "Session table does not exist" from PrismaSessionStorage).
 predev = "npx prisma generate"
-dev = "npm exec prisma migrate deploy && npm exec react-router dev"
+dev = "npm exec prisma db push && npm exec react-router dev"

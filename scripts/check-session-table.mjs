@@ -1,8 +1,11 @@
 import { PrismaClient } from "@prisma/client";
-import path from "node:path";
 
-const url =
-  "file:" + path.join(process.cwd(), "prisma", "dev.sqlite").replace(/\\/g, "/");
+const url = process.env.DATABASE_URL;
+if (!url) {
+  console.error("Set DATABASE_URL (see .env.example).");
+  process.exit(1);
+}
+
 const prisma = new PrismaClient({ datasources: { db: { url } } });
 try {
   const n = await prisma.session.count();
