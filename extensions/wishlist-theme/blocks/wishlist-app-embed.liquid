@@ -1,0 +1,68 @@
+{% if block.settings.enable_wishlist %}
+  {{ 'wishlist.css' | asset_url | stylesheet_tag }}
+
+  <div
+    id="eww-wishlist-root"
+    data-proxy-root="{{ shop.secure_url }}/apps/wishlist-plus"
+    data-wishlist-page-url="{{ shop.secure_url }}/apps/wishlist-plus?action=page"
+    data-show-product-page="{{ block.settings.show_product_page }}"
+    data-show-product-grid="{{ block.settings.show_product_grid }}"
+    data-icon-position="{{ block.settings.icon_position }}"
+    data-icon-color="{{ block.settings.icon_color }}"
+    data-icon-active-color="{{ block.settings.icon_active_color }}"
+    data-customer-id="{{ customer.id | default: '' }}"
+    data-customer-email="{{ customer.email | default: '' }}"
+  ></div>
+
+  <script src="{{ 'wishlist.js' | asset_url }}" defer="defer"></script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Wishlist app embed",
+  "target": "body",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable_wishlist",
+      "label": "Enable wishlist",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_product_page",
+      "label": "Show on product page",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_product_grid",
+      "label": "Show on product grid",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "icon_position",
+      "label": "Icon position",
+      "default": "top-right",
+      "options": [
+        { "value": "top-right", "label": "Top right" },
+        { "value": "top-left", "label": "Top left" },
+        { "value": "bottom-right", "label": "Bottom right" }
+      ]
+    },
+    {
+      "type": "color",
+      "id": "icon_color",
+      "label": "Icon color",
+      "default": "#4a4a4a"
+    },
+    {
+      "type": "color",
+      "id": "icon_active_color",
+      "label": "Active icon color",
+      "default": "#d82c0d"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,97 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Note that some adapters may set a maximum length for the String type by default, please ensure your strings are long
+// enough when changing adapters.
+// See https://www.prisma.io/docs/orm/reference/prisma-schema-reference#string for more information
+datasource db {
+  provider = "sqlite"
+  url      = "file:dev.sqlite"
+}
+
+model Session {
+  id            String    @id
+  shop          String
+  state         String
+  isOnline      Boolean   @default(false)
+  scope         String?
+  expires       DateTime?
+  accessToken   String
+  userId        BigInt?
+  firstName     String?
+  lastName      String?
+  email         String?
+  accountOwner  Boolean   @default(false)
+  locale        String?
+  collaborator  Boolean?  @default(false)
+  emailVerified Boolean?  @default(false)
+  refreshToken        String?
+  refreshTokenExpires DateTime?
+}
+
+model WishlistItem {
+  id String @id @default(cuid())
+
+  shopDomain   String
+  visitorId    String
+  customerId   String?
+  customerEmail String?
+
+  productHandle   String
+  productNumericId String?
+
+  priceCents    Int?
+  compareAtPriceCents Int?
+  currencyCode  String?
+
+  isActive Boolean @default(true)
+  addedAt DateTime @default(now())
+  removedAt DateTime?
+  updatedAt DateTime @updatedAt
+
+  @@unique([shopDomain, visitorId, productHandle], name: "shopVisitorProduct")
+  @@index([shopDomain, visitorId])
+  @@index([shopDomain, productNumericId])
+}
+
+model WishlistConversion {
+  id String @id @default(cuid())
+
+  shopDomain   String
+  visitorId    String
+  customerId   String?
+  customerEmail String?
+
+  productHandle String?
+  productNumericId String
+
+  orderId String
+  orderName String?
+
+  revenueCents Int
+  convertedAt DateTime @default(now())
+
+  @@index([shopDomain, visitorId])
+  @@unique([shopDomain, visitorId, orderId, productNumericId], name: "shopVisitorOrderProduct")
+}
+
+model WishlistConfig {
+  id String @id @default(cuid())
+
+  shopDomain String @unique
+
+  enabled       Boolean @default(true)
+  showOnProduct Boolean @default(true)
+  showOnGrid    Boolean @default(true)
+
+  iconStyle    String @default("heart")
+  iconPosition String @default("top-right")
+  buttonLabel  String @default("Add to Wishlist")
+
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+}
