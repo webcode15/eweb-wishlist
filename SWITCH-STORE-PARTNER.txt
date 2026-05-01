@@ -1,0 +1,79 @@
+================================================================================
+  Dusre DEV STORE ya Dusre PARTNER org ke saath app kaam karwana — poori process
+================================================================================
+
+Ye file batati hai kaise is repo ko naye Shopify Partner account / nayi dev shop
+se link karke `shopify app dev` chalate hain.
+
+--------------------------------------------------------------------------------
+A) Sirf DUSRA DEVELOPMENT STORE (Partner org same rahega)
+--------------------------------------------------------------------------------
+
+1) Project folder me kholo:
+   cd "c:\Ankit\shopify\ewebworld app\ewebworld"
+
+2) Shopify me login (agar session purana ho):
+   shopify auth logout
+   shopify auth login
+
+3) Dev server — store select karo jab CLI pooche, ya flag use karo:
+   shopify app dev --reset
+   (Kabhi-kabhi: shopify app dev --store YOUR-STORE.myshopify.com
+    — apne CLI ke `shopify app dev --help` se exact flag dekho.)
+
+4) Nayi dev shop par app INSTALL karna zaroori hai:
+   - CLI jo preview / install link deta hai use follow karo, YA
+   - Partner Dashboard → Apps → tumhara app → Test on development store
+
+5) Prisma / SQLite:
+   - Local DB `prisma/dev.sqlite` same machine par rehti hai; nayi shop ka data
+     bhi isi DB me save hoga (shopDomain se alag-alag shops pata chalenge).
+   - Agar bilkul clean DB chaho: dev band karo, `prisma/dev.sqlite` delete karo,
+     phir `npx prisma migrate deploy` (ya `shopify app dev` jo migrate chalata hai).
+
+--------------------------------------------------------------------------------
+B) DUSRA PARTNER ORGANIZATION (naya Partner account / naya app)
+--------------------------------------------------------------------------------
+
+1) Naye partner par login:
+   shopify auth logout
+   shopify auth login
+   (Browser me sahi org choose karo.)
+
+2) Is codebase ko NAAYE app se jodo (naya client_id aayega):
+   shopify app config link
+   Prompts me naya app select karo — `shopify.app.toml` update ho sakta hai.
+
+3) Secrets / env sync:
+   shopify app env pull
+   (Ya Partner Dashboard se API secret copy karke `.env` banao — `.env.example` dekho.)
+
+4) URLs reset (tunnel / hosting):
+   shopify app dev --reset
+   Taaki App URL, redirect URLs, app proxy URL naye tunnel par sync hon.
+
+5) `shopify app deploy` tab chalao jab production URLs final hon.
+
+NOTE: Purane Partner par bana app naye Partner par "move" karna alag process
+hai; aksar sabse aasan: naye org me naya app + `shopify app config link`.
+
+--------------------------------------------------------------------------------
+C) Useful npm scripts (is repo me)
+--------------------------------------------------------------------------------
+
+  npm run config:link     -> shopify app config link
+  npm run env             -> shopify app env
+  npm run deploy          -> shopify app deploy
+  npm run shopify:logout  -> shopify auth logout
+  npm run shopify:login   -> shopify auth login
+  npm run dev:reset       -> shopify app dev --reset
+
+--------------------------------------------------------------------------------
+D) migration_lock.toml ke baare me
+--------------------------------------------------------------------------------
+
+  Ye file batati hai Prisma migrations kis DATABASE provider ke liye bani hain
+  (ab is project me sqlite). Isse store/partner change karne ka seedha link NAHI
+  hai — store badalne par is file ko change karne ki zaroorat nahi.
+
+================================================================================
