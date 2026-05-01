@@ -1,14 +1,11 @@
--- CreateSchema
-CREATE SCHEMA IF NOT EXISTS "public";
-
 -- CreateTable
 CREATE TABLE "Session" (
-    "id" TEXT NOT NULL,
+    "id" TEXT NOT NULL PRIMARY KEY,
     "shop" TEXT NOT NULL,
     "state" TEXT NOT NULL,
     "isOnline" BOOLEAN NOT NULL DEFAULT false,
     "scope" TEXT,
-    "expires" TIMESTAMP(3),
+    "expires" DATETIME,
     "accessToken" TEXT NOT NULL,
     "userId" BIGINT,
     "firstName" TEXT,
@@ -19,14 +16,12 @@ CREATE TABLE "Session" (
     "collaborator" BOOLEAN DEFAULT false,
     "emailVerified" BOOLEAN DEFAULT false,
     "refreshToken" TEXT,
-    "refreshTokenExpires" TIMESTAMP(3),
-
-    CONSTRAINT "Session_pkey" PRIMARY KEY ("id")
+    "refreshTokenExpires" DATETIME
 );
 
 -- CreateTable
 CREATE TABLE "WishlistItem" (
-    "id" TEXT NOT NULL,
+    "id" TEXT NOT NULL PRIMARY KEY,
     "shopDomain" TEXT NOT NULL,
     "visitorId" TEXT NOT NULL,
     "customerId" TEXT,
@@ -37,16 +32,14 @@ CREATE TABLE "WishlistItem" (
     "compareAtPriceCents" INTEGER,
     "currencyCode" TEXT,
     "isActive" BOOLEAN NOT NULL DEFAULT true,
-    "addedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "removedAt" TIMESTAMP(3),
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "WishlistItem_pkey" PRIMARY KEY ("id")
+    "addedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "removedAt" DATETIME,
+    "updatedAt" DATETIME NOT NULL
 );
 
 -- CreateTable
 CREATE TABLE "WishlistConversion" (
-    "id" TEXT NOT NULL,
+    "id" TEXT NOT NULL PRIMARY KEY,
     "shopDomain" TEXT NOT NULL,
     "visitorId" TEXT NOT NULL,
     "customerId" TEXT,
@@ -56,14 +49,12 @@ CREATE TABLE "WishlistConversion" (
     "orderId" TEXT NOT NULL,
     "orderName" TEXT,
     "revenueCents" INTEGER NOT NULL,
-    "convertedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT "WishlistConversion_pkey" PRIMARY KEY ("id")
+    "convertedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- CreateTable
 CREATE TABLE "WishlistConfig" (
-    "id" TEXT NOT NULL,
+    "id" TEXT NOT NULL PRIMARY KEY,
     "shopDomain" TEXT NOT NULL,
     "enabled" BOOLEAN NOT NULL DEFAULT true,
     "showOnProduct" BOOLEAN NOT NULL DEFAULT true,
@@ -71,10 +62,8 @@ CREATE TABLE "WishlistConfig" (
     "iconStyle" TEXT NOT NULL DEFAULT 'heart',
     "iconPosition" TEXT NOT NULL DEFAULT 'top-right',
     "buttonLabel" TEXT NOT NULL DEFAULT 'Add to Wishlist',
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT "WishlistConfig_pkey" PRIMARY KEY ("id")
+    "updatedAt" DATETIME NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- CreateIndex
@@ -90,7 +79,7 @@ CREATE UNIQUE INDEX "WishlistItem_shopDomain_visitorId_productHandle_key" ON "Wi
 CREATE INDEX "WishlistConversion_shopDomain_visitorId_idx" ON "WishlistConversion"("shopDomain", "visitorId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "WishlistConversion_shopDomain_visitorId_orderId_productNume_key" ON "WishlistConversion"("shopDomain", "visitorId", "orderId", "productNumericId");
+CREATE UNIQUE INDEX "WishlistConversion_shopDomain_visitorId_orderId_productNumericId_key" ON "WishlistConversion"("shopDomain", "visitorId", "orderId", "productNumericId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "WishlistConfig_shopDomain_key" ON "WishlistConfig"("shopDomain");
