@@ -1,5 +1,9 @@
 (function () {
   const root = document.getElementById("eww-wishlist-root");
+  const shopDomain =
+    root?.dataset?.shopDomain ||
+    document.querySelector(".eww-wishlist-product-block")?.dataset?.shopDomain ||
+    "";
 
   const proxyRoot = root?.dataset?.proxyRoot || "";
   const wishlistPageUrl = root?.dataset?.wishlistPageUrl || "/apps/wishlist-plus?action=page";
@@ -7,6 +11,17 @@
   const customerEmail = root?.dataset?.customerEmail || "";
 
   let activeHandles = new Set();
+
+  function appProxyFetchUrl(action, queryParams = {}) {
+    if (!proxyRoot) return "";
+    const url = new URL(proxyRoot);
+    if (shopDomain) url.searchParams.set("shop", shopDomain);
+    url.searchParams.set("action", action);
+    Object.entries(queryParams).forEach(([k, v]) => {
+      if (v != null && v !== "") url.searchParams.set(k, String(v));
+    });
+    return url.toString();
+  }
 
   function getLocalWishlist() {
     try {
@@ -99,7 +114,7 @@
     if (!proxyRoot) return;
     try {
       const res = await fetch(
-        `${proxyRoot}?action=state&visitorId=${encodeURIComponent(visitorId)}`,
+        appProxyFetchUrl("state", { visitorId }),
         { method: "GET" },
       );
       const data = await res.json();
@@ -114,7 +129,7 @@
 
   async function toggleOnBackend(visitorId, productHandle) {
     if (!proxyRoot) return null;
-    const res = await fetch(`${proxyRoot}?action=toggle`, {
+    const res = await fetch(appProxyFetchUrl("toggle"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -125,7 +140,17 @@
         customerEmail: customerEmail || null,
       }),
     });
-    const data = await res.json();
+    let data = null;
+    try {
+      data = await res.json();
+    } catch {
+      console.warn("[eww-wishlist] toggle: non-JSON response", res.status, proxyRoot);
+      return { ok: false };
+    }
+    if (!res.ok || !data?.ok) {
+      console.warn("[eww-wishlist] toggle failed", res.status, data);
+      return { ok: false, ...(data && typeof data === "object" ? data : {}) };
+    }
     return data;
   }
 
@@ -167,9 +192,18 @@
           setLocalWishlist([...activeHandles]);
           update();
           if (data.active) showWishlistToast();
+        } else {
+          // Proxy/auth failed — revert optimistic UI so it matches the server.
+          if (wasActive) activeHandles.add(handle);
+          else activeHandles.delete(handle);
+          setLocalWishlist([...activeHandles]);
+          update();
         }
       } catch {
-        // keep optimistic state
+        if (wasActive) activeHandles.add(handle);
+        else activeHandles.delete(handle);
+        setLocalWishlist([...activeHandles]);
+        update();
       }
     });
 
@@ -184,9 +218,20 @@
     }
   }
 
+  function productHandleFromPath() {
+    const pathname = window.location.pathname;
+    const marker = "/products/";
+    const idx = pathname.indexOf(marker);
+    if (idx === -1) return null;
+    return pathname
+      .slice(idx + marker.length)
+      .split("/")[0]
+      ?.split("?")[0] || null;
+  }
+
   function addToProductGrid(options) {
     const cards = document.querySelectorAll(
-      '[data-product-handle], .product-card, .card-wrapper, .grid__item'
+      '[data-product-handle], .product-card, .card-wrapper, .grid__item, li.grid__item, .card--media, .product-grid__item, .collection-product-card, [data-product-id]'
     );
 
     cards.forEach(function (card) {
@@ -206,13 +251,15 @@
   }
 
   function addToProductPage(options) {
-    const pathMatch = window.location.pathname.match(/\/products\/([^/]+)/);
-    const handle = pathMatch?.[1];
+    const handle = productHandleFromPath();
     if (!handle) return;
 
     const gallery =
       document.querySelector(".product") ||
       document.querySelector(".product__media-wrapper") ||
+      document.querySelector(".product__column-sticky") ||
+      document.querySelector('[class*="product__media"]') ||
+      document.querySelector("#ProductInfo") ||
       document.querySelector("main");
 
     if (!gallery || gallery.querySelector(".eww-wishlist-icon")) return;
@@ -254,9 +301,15 @@
             else activeHandles.delete(handle);
             setLocalWishlist([...activeHandles]);
             if (data.active) showWishlistToast();
+          } else {
+            if (wasActive) activeHandles.add(handle);
+            else activeHandles.delete(handle);
+            setLocalWishlist([...activeHandles]);
           }
         } catch {
-          // keep optimistic state
+          if (wasActive) activeHandles.add(handle);
+          else activeHandles.delete(handle);
+          setLocalWishlist([...activeHandles]);
         }
 
         refreshAllUI(options);
@@ -289,6 +342,10 @@
 
     if (root?.dataset?.showProductGrid === "true") {
       addToProductGrid(options);
+      // Some themes render collection cards after first paint (lazy sections).
+      window.setTimeout(function () {
+        addToProductGrid(options);
+      }, 600);
     }
 
     // Then sync real state from backend.

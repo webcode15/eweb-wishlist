@@ -1,22 +1,7 @@
 import { PrismaClient } from "@prisma/client";
-import { existsSync } from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 
-function getAppRoot() {
-  const fromModule = path.join(
-    path.dirname(fileURLToPath(import.meta.url)),
-    "..",
-  );
-  if (existsSync(path.join(fromModule, "prisma", "schema.prisma"))) {
-    return fromModule;
-  }
-  return process.cwd();
-}
-
-const defaultUrl = `file:${path
-  .join(getAppRoot(), "prisma", "dev.sqlite")
-  .replace(/\\/g, "/")}`;
+const defaultUrl =
+  "postgresql://postgres:postgres@127.0.0.1:5432/ewebworld?schema=public";
 const url = process.env.DATABASE_URL?.trim() || defaultUrl;
 
 const prisma = new PrismaClient({ datasources: { db: { url } } });

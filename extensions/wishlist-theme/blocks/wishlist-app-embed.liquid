@@ -3,10 +3,11 @@
 
   <div
     id="eww-wishlist-root"
+    data-shop-domain="{{ shop.permanent_domain }}"
     data-proxy-root="{{ shop.secure_url }}/apps/wishlist-plus"
     data-wishlist-page-url="{{ shop.secure_url }}/apps/wishlist-plus?action=page"
-    data-show-product-page="{{ block.settings.show_product_page }}"
-    data-show-product-grid="{{ block.settings.show_product_grid }}"
+    data-show-product-page="{% if block.settings.show_product_page %}true{% else %}false{% endif %}"
+    data-show-product-grid="{% if block.settings.show_product_grid %}true{% else %}false{% endif %}"
     data-icon-position="{{ block.settings.icon_position }}"
     data-icon-color="{{ block.settings.icon_color }}"
     data-icon-active-color="{{ block.settings.icon_active_color }}"

@@ -12,11 +12,16 @@ RUN npm ci
 
 COPY . .
 
+# Use the PostgreSQL schema for production builds
+RUN cp prisma/schema.production.prisma prisma/schema.prisma
+
 RUN npm run build
 
 # Drop devDependencies to keep the image smaller
 RUN npm prune --omit=dev
 
+# Render and other proxies must reach the process; react-router-serve binds to HOST when set.
+ENV HOST=0.0.0.0
 ENV PORT=3000
 EXPOSE 3000
 

@@ -25,11 +25,10 @@ A) Sirf DUSRA DEVELOPMENT STORE (Partner org same rahega)
    - CLI jo preview / install link deta hai use follow karo, YA
    - Partner Dashboard → Apps → tumhara app → Test on development store
 
-5) Prisma / SQLite:
-   - Local DB `prisma/dev.sqlite` same machine par rehti hai; nayi shop ka data
-     bhi isi DB me save hoga (shopDomain se alag-alag shops pata chalenge).
-   - Agar bilkul clean DB chaho: dev band karo, `prisma/dev.sqlite` delete karo,
-     phir `npx prisma migrate deploy` (ya `shopify app dev` jo migrate chalata hai).
+5) Prisma / PostgreSQL:
+   - Local: `docker compose up -d` phir `DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/ewebworld`
+   - Nayi shop ka data same DB me shopDomain se alag-alag.
+   - Clean DB: Postgres me tables drop / naya Neon project, phir `npx prisma migrate deploy`.
 
 --------------------------------------------------------------------------------
 B) DUSRA PARTNER ORGANIZATION (naya Partner account / naya app)
@@ -73,7 +72,7 @@ D) migration_lock.toml ke baare me
 --------------------------------------------------------------------------------
 
   Ye file batati hai Prisma migrations kis DATABASE provider ke liye bani hain
-  (ab is project me sqlite). Isse store/partner change karne ka seedha link NAHI
+  (ab is project me PostgreSQL). Isse store/partner change karne ka seedha link NAHI
   hai — store badalne par is file ko change karne ki zaroorat nahi.
 
 ================================================================================

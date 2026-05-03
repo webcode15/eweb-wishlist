@@ -16,6 +16,25 @@ import { useLoaderData, useNavigate } from "react-router";
 import { authenticate } from "../shopify.server";
 import prisma from "../db.server";
 
+/** Static demo metrics — defined once to avoid reallocating each render. */
+const DASHBOARD_METRICS = [
+  {
+    title: "Shoppers",
+    subtitle: "Who interacted the most",
+    items: ["ankit@example.com", "olive@example.com", "swety@example.com"],
+  },
+  {
+    title: "Popular Products",
+    subtitle: "Wishlisted by most users",
+    items: ["Chamomile Oil", "Bouncy Bunny Backpack", "Poppy Penguin Pillow"],
+  },
+  {
+    title: "Running out soon",
+    subtitle: "Low in stock, high in demand",
+    items: ["Sunny Socks", "Forest Fox Flask", "Poppy Penguin Pillow"],
+  },
+];
+
 export const loader = async ({ request }) => {
   const { session } = await authenticate.admin(request);
   const shopDomain = session?.shop;
@@ -98,13 +117,8 @@ export default function Index() {
     shopify.toast.show("Opened theme editor in a new tab");
   };
 
-  const handleManageApp = () => {
-    shopify.toast.show("Manage app: opening configurations");
-    navigate("/app/configurations");
-  };
-
-  const handleCustomize = () => {
-    shopify.toast.show("Customize: opening configurations");
+  const goToConfigurations = (toastMessage) => {
+    shopify.toast.show(toastMessage);
     navigate("/app/configurations");
   };
 
@@ -120,30 +134,16 @@ export default function Index() {
     window.open("https://shopify.dev/docs/apps", "_blank", "noopener,noreferrer");
   };
 
-  const metrics = [
-    {
-      title: "Shoppers",
-      subtitle: "Who interacted the most",
-      items: ["ankit@example.com", "olive@example.com", "swety@example.com"],
-    },
-    {
-      title: "Popular Products",
-      subtitle: "Wishlisted by most users",
-      items: ["Chamomile Oil", "Bouncy Bunny Backpack", "Poppy Penguin Pillow"],
-    },
-    {
-      title: "Running out soon",
-      subtitle: "Low in stock, high in demand",
-      items: ["Sunny Socks", "Forest Fox Flask", "Poppy Penguin Pillow"],
-    },
-  ];
-
   return (
     <Page
       title="Wishlist Analytics Dashboard"
       primaryAction={{ content: "View store", onAction: handleViewStore }}
       secondaryActions={[
-        { content: "Manage app", onAction: handleManageApp },
+        {
+          content: "Manage app",
+          onAction: () =>
+            goToConfigurations("Manage app: opening configurations"),
+        },
       ]}
     >
       <BlockStack gap="500">
@@ -214,7 +214,12 @@ export default function Index() {
                 and theme position.
               </Text>
               <InlineStack gap="200">
-                <Button variant="primary" onClick={handleCustomize}>
+                <Button
+                  variant="primary"
+                  onClick={() =>
+                    goToConfigurations("Customize: opening configurations")
+                  }
+                >
                   Customize button
                 </Button>
                 <Button onClick={handleLater}>I&apos;ll do this later</Button>
@@ -239,7 +244,7 @@ export default function Index() {
             Metrics
           </Text>
           <InlineGrid columns={{ xs: 1, md: 3 }} gap="400">
-            {metrics.map((block) => (
+            {DASHBOARD_METRICS.map((block) => (
               <Card key={block.title}>
                 <BlockStack gap="300">
                   <Text as="h3" variant="headingSm">
@@ -250,7 +255,9 @@ export default function Index() {
                   </Text>
                   <List type="bullet">
                     {block.items.map((item) => (
-                      <List.Item key={item}>{item}</List.Item>
+                      <List.Item key={`${block.title}:${item}`}>
+                        {item}
+                      </List.Item>
                     ))}
                   </List>
                 </BlockStack>

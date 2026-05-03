@@ -1,0 +1,25 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "b047728ea29e1692b7137aece2db1fdb"
+name = "ewebworld"
+application_url = "https://example.com"
+embedded = true
+
+[build]
+automatically_update_urls_on_dev = true
+
+[webhooks]
+api_version = "2026-07"
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "read_customers,read_orders,read_products,write_app_proxy,write_metaobject_definitions,write_metaobjects,write_products"
+
+[auth]
+redirect_urls = [ "https://example.com/api/auth" ]
+
+# Storefront uses {{ shop.url }}/apps/wishlist-plus — must match Partner app proxy.
+[app_proxy]
+url = "https://example.com/wishlist-proxy"
+subpath = "wishlist-plus"
+prefix = "apps"

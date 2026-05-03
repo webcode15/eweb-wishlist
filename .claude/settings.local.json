@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(docker --version)",
+      "Bash(docker compose *)",
+      "Bash(DATABASE_URL=\"file:./prisma/dev.db\" npx prisma migrate deploy)"
+    ]
+  }
+}

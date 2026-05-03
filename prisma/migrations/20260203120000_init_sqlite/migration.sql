@@ -67,13 +67,13 @@ CREATE TABLE "WishlistConfig" (
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "WishlistItem_shopDomain_visitorId_productHandle_key" ON "WishlistItem"("shopDomain", "visitorId", "productHandle");
+
+-- CreateIndex
 CREATE INDEX "WishlistItem_shopDomain_visitorId_idx" ON "WishlistItem"("shopDomain", "visitorId");
 
 -- CreateIndex
 CREATE INDEX "WishlistItem_shopDomain_productNumericId_idx" ON "WishlistItem"("shopDomain", "productNumericId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "WishlistItem_shopDomain_visitorId_productHandle_key" ON "WishlistItem"("shopDomain", "visitorId", "productHandle");
 
 -- CreateIndex
 CREATE INDEX "WishlistConversion_shopDomain_visitorId_idx" ON "WishlistConversion"("shopDomain", "visitorId");

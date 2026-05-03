@@ -2,6 +2,7 @@
   {{ 'wishlist.css' | asset_url | stylesheet_tag }}
   <div
     class="eww-wishlist-product-block"
+    data-shop-domain="{{ shop.permanent_domain }}"
     data-wishlist-handle="{{ product.handle }}"
     data-button-label="{{ block.settings.button_label | escape }}"
   >

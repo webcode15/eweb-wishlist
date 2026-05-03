@@ -1,38 +1,65 @@
-Free hosting (recommended combo)
-================================
+Upload / deploy process (free tier: Render + Neon)
+==================================================
 
-1) Postgres (free): https://neon.tech — create project, copy connection string.
-   Append ?sslmode=require if the host requires SSL (Neon usually does).
+Prerequisites
+-------------
+- GitHub (or GitLab) repo with this code pushed.
+- Shopify Partner account + app (API key & secret).
+- This app uses PostgreSQL only (not SQLite). Local: `docker compose up -d`.
 
-2) Web app (free): https://render.com — New + Blueprint, connect this repo, or:
-   New Web Service -> Dockerfile deploy from GitHub.
-   Set environment variables:
-   - DATABASE_URL = (Neon connection string)
-   - SHOPIFY_API_KEY, SHOPIFY_API_SECRET, SCOPES, SHOPIFY_APP_URL
-     (same as local .env from Partner Dashboard / shopify app env)
+Step 1 — Neon (free Postgres)
+------------------------------
+1. Open https://neon.tech and sign in.
+2. Create a project → copy the connection string (PostgreSQL URL).
+3. Append `?sslmode=require` if Neon shows that in their dashboard (many strings include it already).
 
-   SHOPIFY_APP_URL must be your public HTTPS URL, e.g.
+Step 2 — Render (free web service)
+-----------------------------------
+1. Open https://render.com → sign in → connect your Git provider.
+2. New → Blueprint (or "New Web Service" if not using render.yaml).
+   - If Blueprint: select this repo; Render reads `render.yaml`.
+3. In the service environment variables, set (mark secret where needed):
+
+   DATABASE_URL     = <Neon connection string>
+   SHOPIFY_API_KEY  = <from Partner Dashboard or `shopify app env`>
+   SHOPIFY_API_SECRET = <secret>
+   SCOPES           = read_customers,read_orders,read_products,write_app_proxy,write_metaobject_definitions,write_metaobjects,write_products
+   SHOPIFY_APP_URL  = https://<your-service-name>.onrender.com
+   NODE_ENV         = production
+   PORT             = 3000  (often set automatically)
+
+4. Deploy. Wait until the service is "Live". Note the public URL, e.g.
    https://eweb-wishlist-web.onrender.com
 
-3) Shopify app URLs: after the service is live, update the app config:
+Step 3 — Point Shopify at Render
+---------------------------------
+1. Set `SHOPIFY_APP_URL` on Render to your exact HTTPS URL (no trailing slash issues in app config).
+2. From your PC, in the project folder:
+
    shopify app deploy
-   (or Partner Dashboard -> App setup -> URLs)
 
-   Set App URL and redirect URLs to your Render host.
-   Set App proxy URL to https://YOUR-HOST/wishlist-proxy
+   Or in Partner Dashboard → App setup:
+   - App URL: https://YOUR-SERVICE.onrender.com
+   - Allowed redirection URL(s): https://YOUR-SERVICE.onrender.com/api/auth
+   - App proxy: Subpath prefix `apps`, subpath `wishlist-plus`, Proxy URL
+     https://YOUR-SERVICE.onrender.com/wishlist-proxy
 
-Local development
-=================
+3. Reinstall or open the app on your dev store if Shopify asks to update scopes.
 
-docker compose up -d
-Copy .env.example to .env and set DATABASE_URL + Shopify vars.
-npm install
-npx prisma migrate deploy
-shopify app dev
+Step 4 — Verify
+---------------
+- Open the app in Admin (embedded) — should load without DB errors.
+- Storefront wishlist → check data appears after toggles (DB is now Neon).
+
+Local development after this change
+-------------------------------------
+1. docker compose up -d
+2. Copy `.env.example` to `.env` and set DATABASE_URL, SHOPIFY_* (or use `shopify app env pull`).
+3. npx prisma migrate deploy
+4. shopify app dev
 
 Notes
-=====
-
-- Free Render spins down when idle; first request can be slow.
-- Do not commit .env or API secrets.
-- Old SQLite databases are no longer used; data must be re-created on Postgres.
+-----
+- Free Render sleeps when idle; first request can be slow.
+- Do not commit `.env` or API secrets.
+- Old `prisma/dev.sqlite` is obsolete; migrate data manually if needed.
