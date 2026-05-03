@@ -1,8 +1,8 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-client_id = "fda94bed5b67f4b2d2eea29338ecb216"
+client_id = "b847728ea29e1692b7137aece2db1fdb"
 name = "ewebworld"
-application_url = "https://example.com"
+application_url = "https://eweb-wishlist-web.onrender.com"
 embedded = true
 
 [build]
@@ -24,10 +24,10 @@ api_version = "2026-07"
 scopes = "read_customers,read_orders,read_products,write_app_proxy,write_metaobject_definitions,write_metaobjects,write_products"
 
 [auth]
-redirect_urls = [ "https://example.com/api/auth" ]
+redirect_urls = [ "https://eweb-wishlist-web.onrender.com/api/auth" ]
 
 [app_proxy]
-url = "https://example.com/wishlist-proxy"
+url = "https://eweb-wishlist-web.onrender.com/wishlist-proxy"
 subpath = "wishlist-plus"
 prefix = "apps"
 
