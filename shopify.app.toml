@@ -1,6 +1,6 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-client_id = "b847728ea29e1692b7137aece2db1fdb"
+client_id = "b047728ea29e1692b7137aece2db1fdb"
 name = "ewebworld"
 application_url = "https://eweb-wishlist-web.onrender.com"
 embedded = true
